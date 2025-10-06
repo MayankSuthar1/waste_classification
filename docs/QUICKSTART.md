@@ -182,9 +182,18 @@ Access the application at: http://localhost:5000
 1. **Open Browser**
    - Navigate to `http://localhost:5000`
 
-2. **Upload Image**
+2. **Upload Image** (Two Options)
+   
+   **Option A: Upload from Computer**
    - Click the upload area or drag & drop an image
    - Supported formats: JPG, PNG, BMP (up to 16MB)
+   
+   **Option B: Take Photo with Camera** 📷
+   - Click "Take Photo with Camera" button
+   - Allow camera access when prompted
+   - Position the waste item in the camera view
+   - Click "Capture Photo" to take the picture
+   - The photo will be automatically classified
 
 3. **View Results**
    - See predicted waste category

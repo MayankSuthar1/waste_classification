@@ -245,6 +245,76 @@
             color: white;
         }
         
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .button-camera {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .button-camera:hover {
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
+        }
+        
+        #cameraModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .camera-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow: auto;
+            position: relative;
+        }
+        
+        #video {
+            width: 100%;
+            max-width: 640px;
+            border-radius: 10px;
+            background: #000;
+        }
+        
+        #canvas {
+            display: none;
+        }
+        
+        .camera-controls {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .close-camera {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #f5576c;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.5em;
+            cursor: pointer;
+            line-height: 1;
+        }
+        
         footer {
             text-align: center;
             color: white;
@@ -277,6 +347,16 @@
                 <div class="upload-hint">Supported formats: JPG, PNG, BMP (Max 16MB)</div>
                 <input type="file" id="fileInput" accept="image/*">
             </div>
+            
+            <div class="button-group">
+                <button class="button button-camera" onclick="openCamera()">
+                    📷 Take Photo with Camera
+                </button>
+                <button class="button button-secondary" onclick="triggerMobileCamera()" style="display: none;" id="mobileCameraBtn">
+                    📱 Use Phone Camera
+                </button>
+            </div>
+            <input type="file" id="mobileCameraInput" accept="image/*" capture="environment" style="display: none;">
             
             <div id="imagePreview">
                 <img id="previewImage" src="" alt="Preview">
@@ -319,6 +399,26 @@
                 <a href="/api/health">API Status</a>
             </p>
         </footer>
+    </div>
+    
+    <!-- Camera Modal -->
+    <div id="cameraModal">
+        <div class="camera-container">
+            <button class="close-camera" onclick="closeCamera()">×</button>
+            <h2 style="text-align: center; margin-bottom: 20px;">📷 Capture Waste Image</h2>
+            <div id="cameraError" style="display: none; background: #fee; color: #c33; padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 0.9em; white-space: pre-line;"></div>
+            <div id="cameraSelector" style="margin-bottom: 15px; text-align: center; display: none;">
+                <label for="cameraSelect" style="margin-right: 10px; font-weight: 500;">Select Camera:</label>
+                <select id="cameraSelect" onchange="switchCamera()" style="padding: 8px; border-radius: 5px; border: 2px solid #667eea; font-size: 1em;">
+                </select>
+            </div>
+            <video id="video" autoplay playsinline></video>
+            <canvas id="canvas"></canvas>
+            <div class="camera-controls">
+                <button class="button" onclick="capturePhoto()">📸 Capture Photo</button>
+                <button class="button button-secondary" onclick="closeCamera()">Cancel</button>
+            </div>
+        </div>
     </div>
     
     <script>
@@ -465,6 +565,286 @@
             uploadArea.style.display = 'block';
             fileInput.value = '';
         }
+        
+        // Camera functionality
+        let stream = null;
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const cameraModal = document.getElementById('cameraModal');
+        
+        async function openCamera() {
+            try {
+                // First, check if mediaDevices is supported
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    throw new Error('Camera API not supported in this browser');
+                }
+                
+                // Try to request camera first - this may prompt for permission
+                // which then allows enumerateDevices to show device labels
+                let tempStream;
+                try {
+                    tempStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    // Stop it immediately, we just needed permission
+                    tempStream.getTracks().forEach(track => track.stop());
+                } catch (permErr) {
+                    console.log('Initial permission request:', permErr.message);
+                }
+                
+                // Now try to get list of available devices
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const videoDevices = devices.filter(device => device.kind === 'videoinput');
+                
+                console.log('All devices:', devices);
+                console.log('Video devices found:', videoDevices);
+                
+                if (videoDevices.length === 0) {
+                    // No camera detected - offer alternative
+                    showNoCameraDialog();
+                    return;
+                }
+                
+                console.log('Available cameras:', videoDevices.length);
+                
+                // Try multiple constraint configurations
+                let constraints;
+                
+                // Try 1: Environment camera with flexible constraints
+                try {
+                    constraints = { 
+                        video: { 
+                            facingMode: { ideal: 'environment' },
+                            width: { ideal: 1280, min: 640 },
+                            height: { ideal: 720, min: 480 }
+                        } 
+                    };
+                    stream = await navigator.mediaDevices.getUserMedia(constraints);
+                } catch (e) {
+                    console.log('Environment camera not available, trying user camera...');
+                    
+                    // Try 2: User (front) camera
+                    try {
+                        constraints = { 
+                            video: { 
+                                facingMode: { ideal: 'user' },
+                                width: { ideal: 1280, min: 640 },
+                                height: { ideal: 720, min: 480 }
+                            } 
+                        };
+                        stream = await navigator.mediaDevices.getUserMedia(constraints);
+                    } catch (e2) {
+                        console.log('Specific camera not available, trying any camera...');
+                        
+                        // Try 3: Any available camera with basic constraints
+                        try {
+                            constraints = { 
+                                video: {
+                                    width: { ideal: 1280, min: 640 },
+                                    height: { ideal: 720, min: 480 }
+                                }
+                            };
+                            stream = await navigator.mediaDevices.getUserMedia(constraints);
+                        } catch (e3) {
+                            console.log('Trying simplest constraints...');
+                            
+                            // Try 4: Simplest possible - just request video
+                            constraints = { video: true };
+                            stream = await navigator.mediaDevices.getUserMedia(constraints);
+                        }
+                    }
+                }
+                
+                // If we got here, we have a stream!
+                video.srcObject = stream;
+                cameraModal.style.display = 'flex';
+                
+                console.log('Camera opened successfully!');
+                console.log('Stream settings:', stream.getVideoTracks()[0].getSettings());
+                
+                // Populate camera selector if multiple cameras available
+                await populateCameraSelector();
+                
+            } catch (err) {
+                console.error('Camera error:', err);
+                let errorMessage = 'Unable to access camera: ' + err.message;
+                
+                // Provide specific guidance based on error
+                if (err.name === 'NotFoundError' || err.message.includes('not found')) {
+                    errorMessage += '\n\nTroubleshooting:\n';
+                    errorMessage += '• Make sure your camera is connected and not in use by another application\n';
+                    errorMessage += '• Try closing other apps that might be using the camera (Zoom, Teams, Skype)\n';
+                    errorMessage += '• Restart your browser and try again';
+                } else if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                    errorMessage += '\n\nCamera permission denied. Please:\n';
+                    errorMessage += '• Click the camera icon in your browser address bar\n';
+                    errorMessage += '• Select "Always allow" for camera access\n';
+                    errorMessage += '• Refresh the page and try again';
+                } else if (err.name === 'NotReadableError') {
+                    errorMessage += '\n\nCamera is in use by another application.\n';
+                    errorMessage += 'Please close other apps using the camera.';
+                }
+                
+                showError(errorMessage);
+            }
+        }
+        
+        function closeCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            cameraModal.style.display = 'none';
+            document.getElementById('cameraError').style.display = 'none';
+            document.getElementById('cameraSelector').style.display = 'none';
+        }
+        
+        // Populate camera selector with available devices
+        async function populateCameraSelector() {
+            try {
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const videoDevices = devices.filter(device => device.kind === 'videoinput');
+                
+                if (videoDevices.length > 1) {
+                    const selector = document.getElementById('cameraSelect');
+                    selector.innerHTML = '';
+                    
+                    videoDevices.forEach((device, index) => {
+                        const option = document.createElement('option');
+                        option.value = device.deviceId;
+                        option.text = device.label || `Camera ${index + 1}`;
+                        selector.appendChild(option);
+                    });
+                    
+                    document.getElementById('cameraSelector').style.display = 'block';
+                    return videoDevices;
+                }
+            } catch (err) {
+                console.error('Error enumerating devices:', err);
+            }
+            return [];
+        }
+        
+        // Switch to a different camera
+        async function switchCamera() {
+            const deviceId = document.getElementById('cameraSelect').value;
+            
+            // Stop current stream
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            
+            try {
+                // Start new stream with selected device
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        deviceId: { exact: deviceId },
+                        width: { ideal: 1280, min: 640 },
+                        height: { ideal: 720, min: 480 }
+                    }
+                });
+                
+                video.srcObject = stream;
+                console.log('Switched to camera:', deviceId);
+            } catch (err) {
+                console.error('Error switching camera:', err);
+                showCameraError('Failed to switch camera: ' + err.message);
+            }
+        }
+        
+        function showCameraError(message) {
+            const errorDiv = document.getElementById('cameraError');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+        
+        function capturePhoto() {
+            // Set canvas size to video size
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            // Draw video frame to canvas
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Convert canvas to blob
+            canvas.toBlob((blob) => {
+                if (blob) {
+                    // Create a file from blob
+                    const file = new File([blob], 'camera-capture.jpg', { type: 'image/jpeg' });
+                    
+                    // Close camera
+                    closeCamera();
+                    
+                    // Show preview
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        previewImage.src = e.target.result;
+                        imagePreview.style.display = 'block';
+                        uploadArea.style.display = 'none';
+                    };
+                    reader.readAsDataURL(file);
+                    
+                    // Upload and classify
+                    uploadAndClassify(file);
+                }
+            }, 'image/jpeg', 0.95);
+        }
+        
+        // Mobile camera fallback (uses native camera app)
+        const mobileCameraInput = document.getElementById('mobileCameraInput');
+        
+        function triggerMobileCamera() {
+            mobileCameraInput.click();
+        }
+        
+        mobileCameraInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                handleFile(e.target.files[0]);
+            }
+        });
+        
+        // Show dialog when no camera is found
+        function showNoCameraDialog() {
+            const message = `No camera detected on your device.
+
+Options:
+1. Check if camera is connected and enabled
+2. Close other apps using the camera (Zoom, Teams, etc.)
+3. Restart your browser
+4. Use "Click to upload" to select an existing photo
+
+On Mobile:
+• Use the "📱 Use Phone Camera" button below
+• This opens your phone's native camera app
+
+On Desktop:
+• Make sure your webcam is connected
+• Enable camera in Device Manager (Windows)
+• Check System Preferences (Mac)`;
+            
+            alert(message);
+            
+            // Show mobile camera button as alternative
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            if (isMobile) {
+                document.getElementById('mobileCameraBtn').style.display = 'inline-block';
+            }
+        }
+        
+        // Detect if mobile and show appropriate button
+        window.addEventListener('load', () => {
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            if (isMobile) {
+                // On mobile, show the mobile camera button
+                document.getElementById('mobileCameraBtn').style.display = 'inline-block';
+            }
+        });
+        
+        // Close camera when clicking outside the modal
+        cameraModal.addEventListener('click', (e) => {
+            if (e.target === cameraModal) {
+                closeCamera();
+            }
+        });
     </script>
 </body>
 </html>
