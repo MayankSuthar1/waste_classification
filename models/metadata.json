@@ -1,0 +1,31 @@
+{
+    "classes": [
+        "Carton",
+        "Glass",
+        "Metal",
+        "Organic Waste",
+        "Other Plastics",
+        "Paper and Cardboard",
+        "Plastic",
+        "Textiles",
+        "Wood"
+    ],
+    "num_classes": 9,
+    "train_samples": 4570,
+    "val_samples": 508,
+    "train_accuracy": 0.9993435448577681,
+    "val_accuracy": 0.8700787401574803,
+    "squeezenet_version": "1_1",
+    "embedding_dim": 512,
+    "xgboost_params": {
+        "max_depth": 6,
+        "learning_rate": 0.1,
+        "n_estimators": 200,
+        "objective": "multi:softmax",
+        "eval_metric": "mlogloss",
+        "use_label_encoder": false,
+        "random_state": 42,
+        "tree_method": "hist",
+        "n_jobs": -1
+    }
+}

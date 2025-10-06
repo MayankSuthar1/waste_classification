@@ -1,0 +1,47 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# Model files (optional - uncomment if you don't want to track models)
+# models/*.pth
+# models/*.json
+# models/*.pkl
+
+# Data files
+data/train/**/*.jpg
+data/train/**/*.jpeg
+data/train/**/*.png
+data/test/**/*.jpg
+data/test/**/*.jpeg
+data/test/**/*.png
+
+# Uploaded files
+static/uploads/*
+!static/uploads/.gitkeep
+
+# Results
+results/*.png
+results/*.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Logs
+*.log
