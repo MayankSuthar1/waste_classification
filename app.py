@@ -93,12 +93,6 @@ def upload_file():
         return jsonify({'error': f'Prediction failed: {str(e)}'}), 500
 
 
-@app.route('/about')
-def about():
-    """About page"""
-    return render_template('about.html')
-
-
 @app.route('/api/health')
 def health_check():
     """Health check endpoint"""

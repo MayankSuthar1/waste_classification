@@ -11,11 +11,51 @@
             box-sizing: border-box;
         }
         
+        :root {
+            /* Dark theme (default) */
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #141414;
+            --bg-tertiary: #1a1a1a;
+            --border-color: #222;
+            --border-hover: #333;
+            --text-primary: #ffffff;
+            --text-secondary: #e5e5e5;
+            --text-tertiary: #888;
+            --text-muted: #666;
+            --button-bg: #ffffff;
+            --button-text: #000000;
+            --button-hover: #e5e5e5;
+            --error-bg: #1a0a0a;
+            --error-text: #ff8888;
+            --error-border: #2a1111;
+        }
+        
+        body.light-mode {
+            /* Light theme */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f8f8;
+            --bg-tertiary: #f0f0f0;
+            --border-color: #e0e0e0;
+            --border-hover: #ccc;
+            --text-primary: #000000;
+            --text-secondary: #1a1a1a;
+            --text-tertiary: #666;
+            --text-muted: #999;
+            --button-bg: #000000;
+            --button-text: #ffffff;
+            --button-hover: #333;
+            --error-bg: #fff0f0;
+            --error-text: #cc0000;
+            --error-border: #ffcccc;
+        }
+        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-primary);
             min-height: 100vh;
             padding: 20px;
+            color: var(--text-secondary);
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
         
         .container {
@@ -25,65 +65,97 @@
         
         header {
             text-align: center;
-            color: white;
-            margin-bottom: 40px;
+            margin-bottom: 50px;
         }
         
         header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-size: 2.2em;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-weight: 300;
+            letter-spacing: -0.5px;
         }
         
         header p {
-            font-size: 1.2em;
-            opacity: 0.9;
+            font-size: 1em;
+            color: var(--text-tertiary);
+            font-weight: 300;
+        }
+        
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 300;
+        }
+        
+        .theme-toggle:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--border-hover);
         }
         
         .card {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 48px;
+            border: 1px solid var(--border-color);
             margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            border-color: var(--border-hover);
         }
         
         .upload-area {
-            border: 3px dashed #667eea;
-            border-radius: 15px;
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
             padding: 60px 20px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            background: #f8f9ff;
+            background: var(--bg-primary);
         }
         
         .upload-area:hover {
-            border-color: #764ba2;
-            background: #f0f2ff;
+            border-color: var(--border-hover);
+            background: var(--bg-tertiary);
         }
         
         .upload-area.dragover {
-            border-color: #764ba2;
-            background: #e8ebff;
-            transform: scale(1.02);
+            border-color: var(--text-muted);
+            background: var(--bg-secondary);
         }
         
         .upload-icon {
-            font-size: 4em;
-            color: #667eea;
-            margin-bottom: 20px;
+            font-size: 3em;
+            color: var(--text-muted);
+            margin-bottom: 16px;
         }
         
         .upload-text {
-            font-size: 1.2em;
-            color: #333;
-            margin-bottom: 10px;
+            font-size: 1.1em;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            font-weight: 400;
         }
         
         .upload-hint {
-            color: #666;
-            font-size: 0.9em;
+            color: var(--text-muted);
+            font-size: 0.85em;
+            font-weight: 300;
         }
         
         #fileInput {
@@ -91,24 +163,25 @@
         }
         
         .button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: var(--button-bg);
+            color: var(--button-text);
             border: none;
-            padding: 15px 40px;
-            font-size: 1.1em;
-            border-radius: 30px;
+            padding: 14px 32px;
+            font-size: 0.95em;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            transition: all 0.2s ease;
+            font-weight: 400;
         }
         
         .button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+            background: var(--button-hover);
+            transform: translateY(-1px);
         }
         
         .button:disabled {
-            background: #ccc;
+            background: var(--bg-tertiary);
+            color: var(--text-muted);
             cursor: not-allowed;
             transform: none;
         }
@@ -133,84 +206,102 @@
         
         .result-header {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 32px;
+        }
+        
+        .result-header h2 {
+            color: var(--text-primary);
+            font-weight: 300;
+            font-size: 1.5em;
+        }
+        
+        /* Video element style */
+        #video {
+            border: 1px solid var(--border-color);
         }
         
         .predicted-class {
             font-size: 2em;
-            color: #667eea;
-            font-weight: bold;
+            color: var(--text-primary);
+            font-weight: 300;
             margin: 10px 0;
+            letter-spacing: -0.5px;
         }
         
         .confidence {
-            font-size: 1.3em;
-            color: #666;
+            font-size: 1.1em;
+            color: var(--text-tertiary);
+            font-weight: 300;
         }
         
         .confidence-bar {
             width: 100%;
-            height: 30px;
-            background: #e0e0e0;
-            border-radius: 15px;
+            height: 4px;
+            background: var(--border-color);
+            border-radius: 2px;
             overflow: hidden;
-            margin: 20px 0;
+            margin: 24px 0;
         }
         
         .confidence-fill {
             height: 100%;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-            transition: width 0.5s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
+            background: var(--text-primary);
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .probabilities {
-            margin-top: 30px;
+            margin-top: 48px;
+        }
+        
+        .probabilities h3 {
+            color: var(--text-primary);
+            font-size: 1.1em;
+            font-weight: 400;
+            margin-bottom: 24px;
         }
         
         .probability-item {
-            margin: 15px 0;
+            margin: 20px 0;
         }
         
         .probability-label {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 5px;
-            font-weight: 500;
+            margin-bottom: 8px;
+            font-weight: 300;
+            color: var(--text-tertiary);
+            font-size: 0.9em;
         }
         
         .probability-bar {
             width: 100%;
-            height: 25px;
-            background: #f0f0f0;
-            border-radius: 12px;
+            height: 2px;
+            background: var(--border-color);
+            border-radius: 1px;
             overflow: hidden;
         }
         
         .probability-fill {
             height: 100%;
-            background: #667eea;
-            transition: width 0.5s ease;
-            border-radius: 12px;
+            background: var(--text-muted);
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .loading {
             display: none;
             text-align: center;
-            margin: 30px 0;
+            margin: 40px 0;
+            color: var(--text-tertiary);
+            font-weight: 300;
         }
         
         .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
+            border: 2px solid var(--border-color);
+            border-top: 2px solid var(--text-primary);
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
+            width: 40px;
+            height: 40px;
+            animation: spin 0.8s linear infinite;
             margin: 0 auto 20px;
         }
         
@@ -220,12 +311,15 @@
         }
         
         .error {
-            background: #fee;
-            color: #c33;
-            padding: 15px;
-            border-radius: 10px;
+            background: var(--error-bg);
+            color: var(--error-text);
+            padding: 16px;
+            border-radius: 8px;
             margin: 20px 0;
             display: none;
+            border: 1px solid var(--error-border);
+            font-size: 0.9em;
+            font-weight: 300;
         }
         
         .actions {
@@ -234,15 +328,15 @@
         }
         
         .button-secondary {
-            background: #fff;
-            color: #667eea;
-            border: 2px solid #667eea;
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
             margin: 0 10px;
         }
         
         .button-secondary:hover {
-            background: #667eea;
-            color: white;
+            background: var(--bg-tertiary);
+            border-color: var(--border-hover);
         }
         
         .button-group {
@@ -254,11 +348,14 @@
         }
         
         .button-camera {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
         }
         
         .button-camera:hover {
-            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
+            background: var(--bg-secondary);
+            border-color: var(--border-hover);
         }
         
         #cameraModal {
@@ -275,13 +372,20 @@
         }
         
         .camera-container {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 32px;
             max-width: 90%;
             max-height: 90%;
             overflow: auto;
             position: relative;
+            border: 1px solid var(--border-color);
+        }
+        
+        .camera-container h2 {
+            color: var(--text-primary);
+            font-weight: 300;
+            font-size: 1.3em;
         }
         
         #video {
@@ -295,6 +399,26 @@
             display: none;
         }
         
+        .camera-label {
+            color: var(--text-tertiary);
+        }
+        
+        .camera-select {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-size: 0.9em;
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            font-weight: 300;
+        }
+        
+        #cameraError {
+            background: var(--error-bg);
+            color: var(--error-text);
+            border: 1px solid var(--error-border);
+        }
+        
         .camera-controls {
             margin-top: 20px;
             text-align: center;
@@ -302,47 +426,60 @@
         
         .close-camera {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #f5576c;
-            color: white;
+            top: 16px;
+            right: 16px;
+            background: var(--bg-tertiary);
+            color: var(--text-tertiary);
             border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            font-size: 1.5em;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            font-size: 1.3em;
             cursor: pointer;
             line-height: 1;
+            transition: all 0.2s ease;
+        }
+        
+        .close-camera:hover {
+            background: var(--bg-primary);
+            color: var(--text-primary);
         }
         
         footer {
             text-align: center;
-            color: white;
-            margin-top: 40px;
-            opacity: 0.9;
+            color: var(--text-muted);
+            margin-top: 60px;
+            font-size: 0.85em;
+            font-weight: 300;
         }
         
         footer a {
-            color: white;
+            color: var(--text-tertiary);
             text-decoration: none;
-            margin: 0 10px;
+            margin: 0 12px;
+            transition: color 0.2s ease;
         }
         
         footer a:hover {
-            text-decoration: underline;
+            color: var(--text-primary);
         }
     </style>
 </head>
 <body>
+    <button class="theme-toggle" onclick="toggleTheme()">
+        <span id="themeIcon">☀</span>
+        <span id="themeText">Light</span>
+    </button>
+    
     <div class="container">
         <header>
-            <h1>♻️ Waste Classification</h1>
+            <h1>Waste Classification</h1>
             <p>AI-Powered Waste Sorting using SqueezeNet & XGBoost</p>
         </header>
         
         <div class="card">
             <div class="upload-area" id="uploadArea">
-                <div class="upload-icon">📸</div>
+                <div class="upload-icon">⬆</div>
                 <div class="upload-text">Click to upload or drag and drop</div>
                 <div class="upload-hint">Supported formats: JPG, PNG, BMP (Max 16MB)</div>
                 <input type="file" id="fileInput" accept="image/*">
@@ -350,10 +487,10 @@
             
             <div class="button-group">
                 <button class="button button-camera" onclick="openCamera()">
-                    📷 Take Photo with Camera
+                    Take Photo with Camera
                 </button>
                 <button class="button button-secondary" onclick="triggerMobileCamera()" style="display: none;" id="mobileCameraBtn">
-                    📱 Use Phone Camera
+                    Use Phone Camera
                 </button>
             </div>
             <input type="file" id="mobileCameraInput" accept="image/*" capture="environment" style="display: none;">
@@ -394,8 +531,7 @@
         </div>
         
         <footer>
-            <p>Powered by SqueezeNet & XGBoost | 
-                <a href="/about">About</a> | 
+            <p>
                 <a href="/api/health">API Status</a>
             </p>
         </footer>
@@ -405,17 +541,17 @@
     <div id="cameraModal">
         <div class="camera-container">
             <button class="close-camera" onclick="closeCamera()">×</button>
-            <h2 style="text-align: center; margin-bottom: 20px;">📷 Capture Waste Image</h2>
-            <div id="cameraError" style="display: none; background: #fee; color: #c33; padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 0.9em; white-space: pre-line;"></div>
-            <div id="cameraSelector" style="margin-bottom: 15px; text-align: center; display: none;">
-                <label for="cameraSelect" style="margin-right: 10px; font-weight: 500;">Select Camera:</label>
-                <select id="cameraSelect" onchange="switchCamera()" style="padding: 8px; border-radius: 5px; border: 2px solid #667eea; font-size: 1em;">
+            <h2 style="text-align: center; margin-bottom: 20px;">Capture Waste Image</h2>
+            <div id="cameraError" style="display: none; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 0.85em; white-space: pre-line; font-weight: 300;"></div>
+            <div id="cameraSelector" style="margin-bottom: 16px; text-align: center; display: none;">
+                <label for="cameraSelect" style="margin-right: 12px; font-weight: 300; font-size: 0.9em;" class="camera-label">Select Camera:</label>
+                <select id="cameraSelect" onchange="switchCamera()" class="camera-select">
                 </select>
             </div>
             <video id="video" autoplay playsinline></video>
             <canvas id="canvas"></canvas>
             <div class="camera-controls">
-                <button class="button" onclick="capturePhoto()">📸 Capture Photo</button>
+                <button class="button" onclick="capturePhoto()">Capture Photo</button>
                 <button class="button button-secondary" onclick="closeCamera()">Cancel</button>
             </div>
         </div>
@@ -843,6 +979,38 @@ On Desktop:
         cameraModal.addEventListener('click', (e) => {
             if (e.target === cameraModal) {
                 closeCamera();
+            }
+        });
+        
+        // Theme toggle functionality
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+            const themeText = document.getElementById('themeText');
+            
+            body.classList.toggle('light-mode');
+            
+            if (body.classList.contains('light-mode')) {
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Dark';
+                localStorage.setItem('theme', 'light');
+            } else {
+                themeIcon.textContent = '☀';
+                themeText.textContent = 'Light';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+        
+        // Load saved theme preference
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            const themeIcon = document.getElementById('themeIcon');
+            const themeText = document.getElementById('themeText');
+            
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+                themeIcon.textContent = '🌙';
+                themeText.textContent = 'Dark';
             }
         });
     </script>
